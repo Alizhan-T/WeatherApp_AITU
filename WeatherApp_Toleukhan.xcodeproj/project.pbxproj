@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		21B2799C2F2F83EA00EBB9F2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B2799B2F2F7F1800EBB9F2 /* ContentView.swift */; };
+		21B279A02F2F845C00EBB9F2 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B2799A2F2F7EE800EBB9F2 /* WeatherViewModel.swift */; };
+		21B279A12F2F846000EBB9F2 /* WeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B279972F2F7EA100EBB9F2 /* WeatherModels.swift */; };
+		21B279A22F2F846700EBB9F2 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B279992F2F7ECF00EBB9F2 /* WeatherService.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		21B279772F2F7E5600EBB9F2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +34,10 @@
 		21B279692F2F7E5300EBB9F2 /* WeatherApp_Toleukhan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeatherApp_Toleukhan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		21B279762F2F7E5600EBB9F2 /* WeatherApp_ToleukhanTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeatherApp_ToleukhanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		21B279802F2F7E5600EBB9F2 /* WeatherApp_ToleukhanUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeatherApp_ToleukhanUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		21B279972F2F7EA100EBB9F2 /* WeatherModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModels.swift; sourceTree = "<group>"; };
+		21B279992F2F7ECF00EBB9F2 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		21B2799A2F2F7EE800EBB9F2 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
+		21B2799B2F2F7F1800EBB9F2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +86,10 @@
 		21B279602F2F7E5300EBB9F2 = {
 			isa = PBXGroup;
 			children = (
+				21B279962F2F7E9300EBB9F2 /* Views */,
+				21B279952F2F7E8900EBB9F2 /* Services */,
+				21B279942F2F7E7B00EBB9F2 /* ViewModels */,
+				21B279932F2F7E6F00EBB9F2 /* Models */,
 				21B2796B2F2F7E5300EBB9F2 /* WeatherApp_Toleukhan */,
 				21B279792F2F7E5600EBB9F2 /* WeatherApp_ToleukhanTests */,
 				21B279832F2F7E5600EBB9F2 /* WeatherApp_ToleukhanUITests */,
@@ -90,6 +105,38 @@
 				21B279802F2F7E5600EBB9F2 /* WeatherApp_ToleukhanUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		21B279932F2F7E6F00EBB9F2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				21B279972F2F7EA100EBB9F2 /* WeatherModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		21B279942F2F7E7B00EBB9F2 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				21B2799A2F2F7EE800EBB9F2 /* WeatherViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		21B279952F2F7E8900EBB9F2 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				21B279992F2F7ECF00EBB9F2 /* WeatherService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		21B279962F2F7E9300EBB9F2 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				21B2799B2F2F7F1800EBB9F2 /* ContentView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,6 +283,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				21B279A22F2F846700EBB9F2 /* WeatherService.swift in Sources */,
+				21B2799C2F2F83EA00EBB9F2 /* ContentView.swift in Sources */,
+				21B279A02F2F845C00EBB9F2 /* WeatherViewModel.swift in Sources */,
+				21B279A12F2F846000EBB9F2 /* WeatherModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
