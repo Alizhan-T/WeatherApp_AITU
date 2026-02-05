@@ -13,14 +13,23 @@ struct City: Codable, Identifiable {
 }
 
 struct WeatherResponse: Codable {
-    let current_weather: CurrentWeather
+    let current_units: CurrentUnits?
+    let current: CurrentData?
     let daily: DailyWeather
 }
 
-struct CurrentWeather: Codable {
-    let temperature: Double
-    let windspeed: Double
-    let weathercode: Int
+struct CurrentUnits: Codable {
+    let temperature_2m: String
+    let relative_humidity_2m: String
+    let wind_speed_10m: String
+}
+
+struct CurrentData: Codable {
+    let time: String
+    let temperature_2m: Double
+    let relative_humidity_2m: Int
+    let weather_code: Int
+    let wind_speed_10m: Double
 }
 
 struct DailyWeather: Codable {

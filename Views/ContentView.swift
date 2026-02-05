@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var viewModel = WeatherViewModel()
-    
     @State private var isCelsius = true
     
     var body: some View {
@@ -12,14 +11,10 @@ struct ContentView: View {
                     TextField("Enter city (e.g. Almaty)", text: $viewModel.searchText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .autocapitalization(.none)
-                        .submitLabel(.search) // Кнопка "Search" на клавиатуре
-                        .onSubmit {
-                            Task { await viewModel.search() }
-                        }
+                        .submitLabel(.search)
+                        .onSubmit { Task { await viewModel.search() } }
                     
-                    Button(action: {
-                        Task { await viewModel.search() }
-                    }) {
+                    Button(action: { Task { await viewModel.search() } }) {
                         Image(systemName: "magnifyingglass")
                             .padding()
                             .background(Color.blue)
@@ -30,35 +25,28 @@ struct ContentView: View {
                 .padding()
                 
                 if let error = viewModel.errorMessage {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .padding()
-                        .multilineTextAlignment(.center)
+                    Text(error).foregroundColor(.red).padding()
                 }
                 
                 if viewModel.weather == nil && !viewModel.cities.isEmpty {
                     List(viewModel.cities) { city in
-                        Button(action: {
-                            Task { await viewModel.loadWeather(for: city) }
-                        }) {
+                        Button(action: { Task { await viewModel.loadWeather(for: city) } }) {
                             VStack(alignment: .leading) {
                                 Text(city.name).font(.headline)
-                                Text(city.country ?? "Unknown Country")
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
+                                Text(city.country ?? "Unknown").font(.subheadline).foregroundColor(.gray)
                             }
                         }
                     }
                 }
                 
-                if let weather = viewModel.weather {
+                // --- Weather Display ---
+                if let weather = viewModel.weather, let current = weather.current {
                     ScrollView {
                         VStack(spacing: 20) {
                             
                             if viewModel.isOffline {
-                                Text("OFFLINE MODE - Showing cached data")
-                                    .font(.caption)
-                                    .fontWeight(.bold)
+                                Text("OFFLINE MODE")
+                                    .font(.caption).fontWeight(.bold)
                                     .foregroundColor(.white)
                                     .padding(8)
                                     .frame(maxWidth: .infinity)
@@ -67,35 +55,48 @@ struct ContentView: View {
                                     .padding(.horizontal)
                             }
                             
+                            Text(viewModel.lastUpdateString)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            
                             Picker("Unit", selection: $isCelsius) {
                                 Text("°C").tag(true)
                                 Text("°F").tag(false)
                             }
                             .pickerStyle(SegmentedPickerStyle())
                             .frame(width: 200)
-                            .padding(.top)
                             
                             VStack {
-                                Image(systemName: getWeatherIcon(code: weather.current_weather.weathercode))
+                                Image(systemName: getWeatherIcon(code: current.weather_code))
                                     .resizable()
                                     .renderingMode(.original)
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 120, height: 120)
                                 
-                                let temp = weather.current_weather.temperature
+                                let temp = current.temperature_2m
                                 let displayTemp = isCelsius ? temp : (temp * 9/5 + 32)
                                 
                                 Text("\(Int(round(displayTemp)))°\(isCelsius ? "C" : "F")")
                                     .font(.system(size: 70, weight: .bold))
                                 
-                                Text(String(format: "Wind: %.1f km/h", weather.current_weather.windspeed))
-                                    .font(.title3)
-                                    .foregroundColor(.secondary)
+                                HStack(spacing: 20) {
+                                    VStack {
+                                        Image(systemName: "wind")
+                                        Text("\(String(format: "%.1f", current.wind_speed_10m)) km/h")
+                                    }
+                                    VStack {
+                                        Image(systemName: "humidity")
+                                        Text("\(current.relative_humidity_2m)%") // ВЛАЖНОСТЬ
+                                    }
+                                }
+                                .font(.title3)
+                                .foregroundColor(.secondary)
                             }
                             .padding()
                             
                             Divider()
                             
+                            // Forecast
                             Text("7-Day Forecast")
                                 .font(.headline)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -119,7 +120,6 @@ struct ContentView: View {
                                     
                                     Text("\(Int(round(maxDisplay)))°")
                                         .fontWeight(.bold)
-                                        .foregroundColor(.primary)
                                         .frame(width: 40)
                                     
                                     let minC = weather.daily.temperature_2m_min[index]
@@ -155,11 +155,5 @@ struct ContentView: View {
         case 95...99: return "cloud.bolt.rain.fill"
         default: return "cloud.fill"
         }
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
     }
 }
