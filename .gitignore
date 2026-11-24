@@ -1,0 +1,10 @@
+# Xcode & macOS
+.DS_Store
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM

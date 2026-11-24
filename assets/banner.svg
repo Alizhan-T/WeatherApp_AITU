@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="WeatherApp iOS — SwiftUI MVVM Weather Forecast powered by Open-Meteo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#071226"/>
+      <stop offset="52%" stop-color="#0F2547"/>
+      <stop offset="100%" stop-color="#1E3A8A"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="84%" cy="28%" r="42%">
+      <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="skyGlow" cx="18%" cy="82%" r="44%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#93C5FD" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="320" rx="20" fill="url(#bg)"/>
+  <rect width="1200" height="320" rx="20" fill="url(#grid)"/>
+  <rect width="1200" height="320" rx="20" fill="url(#sunGlow)"/>
+  <rect width="1200" height="320" rx="20" fill="url(#skyGlow)"/>
+  <rect x="0" y="0" width="1200" height="4" rx="2" fill="url(#accent)"/>
+
+  <!-- Pill Badge -->
+  <g transform="translate(64, 52)">
+    <rect x="0" y="0" width="292" height="30" rx="15" fill="#0F1F3D" stroke="#3B82F6" stroke-opacity="0.45" stroke-width="1"/>
+    <circle cx="16" cy="15" r="4.5" fill="#FBBF24"/>
+    <text x="30" y="19.5" fill="#E0F2FE" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="12.5" font-weight="600" letter-spacing="0.4">IOS · SWIFTUI · MVVM · OPEN-METEO</text>
+  </g>
+
+  <!-- Title & Subtitle -->
+  <text x="64" y="140" fill="#F8FAFC" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="50" font-weight="800" letter-spacing="-1.2">WeatherApp</text>
+  <text x="64" y="178" fill="#BFDBFE" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="18.5">Native SwiftUI forecast app with 7-day WMO outlook &amp; offline caching</text>
+
+  <!-- Feature Pills -->
+  <g transform="translate(64, 214)" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="13" font-weight="600">
+    <rect x="0" y="0" width="150" height="34" rx="10" fill="#0F1F3D" stroke="#3B82F6" stroke-opacity="0.35"/>
+    <text x="75" y="21.5" text-anchor="middle" fill="#7DD3FC">Zero API Keys</text>
+
+    <rect x="162" y="0" width="154" height="34" rx="10" fill="#0F1F3D" stroke="#3B82F6" stroke-opacity="0.35"/>
+    <text x="239" y="21.5" text-anchor="middle" fill="#FDE68A">7-Day WMO Icons</text>
+
+    <rect x="328" y="0" width="152" height="34" rx="10" fill="#0F1F3D" stroke="#3B82F6" stroke-opacity="0.35"/>
+    <text x="404" y="21.5" text-anchor="middle" fill="#86EFAC">Offline Snapshot</text>
+
+    <rect x="492" y="0" width="144" height="34" rx="10" fill="#0F1F3D" stroke="#3B82F6" stroke-opacity="0.35"/>
+    <text x="564" y="21.5" text-anchor="middle" fill="#C4B5FD">8 Swift Tests</text>
+  </g>
+
+  <!-- Right-side Weather Telemetry Glass Widget -->
+  <g transform="translate(810, 44)">
+    <rect x="0" y="0" width="326" height="232" rx="22" fill="#0B162C" fill-opacity="0.88" stroke="#60A5FA" stroke-opacity="0.35" stroke-width="1.2"/>
+    <text x="24" y="36" fill="#93C5FD" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="12" font-weight="700" letter-spacing="0.8">ALMATY · KAZAKHSTAN</text>
+
+    <!-- Stylized Sun + Cloud Vector -->
+    <circle cx="268" cy="64" r="22" fill="#FBBF24"/>
+    <rect x="228" y="66" width="52" height="20" rx="10" fill="#F8FAFC"/>
+    <circle cx="244" cy="66" r="13" fill="#F8FAFC"/>
+    <circle cx="262" cy="62" r="15" fill="#F8FAFC"/>
+
+    <text x="24" y="108" fill="#F8FAFC" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="56" font-weight="800" letter-spacing="-1.5">12°C</text>
+    <text x="24" y="132" fill="#BAE6FD" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="14" font-weight="600">Partly cloudy · 14.5 km/h · 58%</text>
+
+    <!-- Mini 4-day strip -->
+    <g transform="translate(24, 152)" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif">
+      <rect x="0" y="0" width="64" height="58" rx="12" fill="#172554" fill-opacity="0.75"/>
+      <text x="32" y="20" text-anchor="middle" fill="#93C5FD" font-size="11" font-weight="600">THU</text>
+      <text x="32" y="45" text-anchor="middle" fill="#F8FAFC" font-size="15" font-weight="700">14°</text>
+
+      <rect x="72" y="0" width="64" height="58" rx="12" fill="#172554" fill-opacity="0.75"/>
+      <text x="104" y="20" text-anchor="middle" fill="#93C5FD" font-size="11" font-weight="600">FRI</text>
+      <text x="104" y="45" text-anchor="middle" fill="#F8FAFC" font-size="15" font-weight="700">9°</text>
+
+      <rect x="144" y="0" width="64" height="58" rx="12" fill="#172554" fill-opacity="0.75"/>
+      <text x="176" y="20" text-anchor="middle" fill="#93C5FD" font-size="11" font-weight="600">SAT</text>
+      <text x="176" y="45" text-anchor="middle" fill="#F8FAFC" font-size="15" font-weight="700">11°</text>
+
+      <rect x="216" y="0" width="64" height="58" rx="12" fill="#172554" fill-opacity="0.75"/>
+      <text x="248" y="20" text-anchor="middle" fill="#93C5FD" font-size="11" font-weight="600">SUN</text>
+      <text x="248" y="45" text-anchor="middle" fill="#F8FAFC" font-size="15" font-weight="700">15°</text>
+    </g>
+  </g>
+</svg>

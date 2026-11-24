@@ -2,158 +2,261 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var viewModel = WeatherViewModel()
-    @State private var isCelsius = true
-    
+    @State private var unit: TemperatureUnit = .celsius
+
+    private let quickCities = ["Almaty", "Astana", "Tokyo", "London", "New York"]
+
     var body: some View {
-        NavigationView {
-            VStack {
-                HStack {
-                    TextField("Enter city (e.g. Almaty)", text: $viewModel.searchText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .autocapitalization(.none)
-                        .submitLabel(.search)
-                        .onSubmit { Task { await viewModel.search() } }
-                    
-                    Button(action: { Task { await viewModel.search() } }) {
-                        Image(systemName: "magnifyingglass")
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+        NavigationStack {
+            VStack(spacing: 0) {
+                searchBar
+
+                if viewModel.isLoading {
+                    HStack(spacing: 10) {
+                        ProgressView()
+                        Text("Loading forecast...")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
+                    .padding(.vertical, 8)
                 }
-                .padding()
-                
+
                 if let error = viewModel.errorMessage {
-                    Text(error).foregroundColor(.red).padding()
+                    Label(error, systemImage: "exclamationmark.triangle.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(.red)
+                        .padding(.horizontal)
+                        .padding(.vertical, 6)
                 }
-                
+
                 if viewModel.weather == nil && !viewModel.cities.isEmpty {
-                    List(viewModel.cities) { city in
-                        Button(action: { Task { await viewModel.loadWeather(for: city) } }) {
-                            VStack(alignment: .leading) {
-                                Text(city.name).font(.headline)
-                                Text(city.country ?? "Unknown").font(.subheadline).foregroundColor(.gray)
-                            }
-                        }
-                    }
+                    cityResultsList
+                } else if let weather = viewModel.weather, let current = weather.current {
+                    weatherDetailScroll(weather: weather, current: current)
+                } else if !viewModel.isLoading {
+                    emptyStateView
                 }
-                
-                // --- Weather Display ---
-                if let weather = viewModel.weather, let current = weather.current {
-                    ScrollView {
-                        VStack(spacing: 20) {
-                            
-                            if viewModel.isOffline {
-                                Text("OFFLINE MODE")
-                                    .font(.caption).fontWeight(.bold)
-                                    .foregroundColor(.white)
-                                    .padding(8)
-                                    .frame(maxWidth: .infinity)
-                                    .background(Color.orange)
-                                    .cornerRadius(8)
-                                    .padding(.horizontal)
-                            }
-                            
-                            Text(viewModel.lastUpdateString)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            
-                            Picker("Unit", selection: $isCelsius) {
-                                Text("°C").tag(true)
-                                Text("°F").tag(false)
-                            }
-                            .pickerStyle(SegmentedPickerStyle())
-                            .frame(width: 200)
-                            
-                            VStack {
-                                Image(systemName: getWeatherIcon(code: current.weather_code))
-                                    .resizable()
-                                    .renderingMode(.original)
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 120, height: 120)
-                                
-                                let temp = current.temperature_2m
-                                let displayTemp = isCelsius ? temp : (temp * 9/5 + 32)
-                                
-                                Text("\(Int(round(displayTemp)))°\(isCelsius ? "C" : "F")")
-                                    .font(.system(size: 70, weight: .bold))
-                                
-                                HStack(spacing: 20) {
-                                    VStack {
-                                        Image(systemName: "wind")
-                                        Text("\(String(format: "%.1f", current.wind_speed_10m)) km/h")
-                                    }
-                                    VStack {
-                                        Image(systemName: "humidity")
-                                        Text("\(current.relative_humidity_2m)%") // ВЛАЖНОСТЬ
-                                    }
-                                }
-                                .font(.title3)
-                                .foregroundColor(.secondary)
-                            }
-                            .padding()
-                            
-                            Divider()
-                            
-                            // Forecast
-                            Text("7-Day Forecast")
-                                .font(.headline)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading)
-                            
-                            ForEach(0..<weather.daily.time.count, id: \.self) { index in
-                                HStack {
-                                    Text(weather.daily.time[index])
-                                        .frame(width: 120, alignment: .leading)
-                                        .font(.subheadline)
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: "sun.max.fill")
-                                        .foregroundColor(.orange)
-                                    
-                                    Spacer()
-                                    
-                                    let maxC = weather.daily.temperature_2m_max[index]
-                                    let maxDisplay = isCelsius ? maxC : (maxC * 9/5 + 32)
-                                    
-                                    Text("\(Int(round(maxDisplay)))°")
-                                        .fontWeight(.bold)
-                                        .frame(width: 40)
-                                    
-                                    let minC = weather.daily.temperature_2m_min[index]
-                                    let minDisplay = isCelsius ? minC : (minC * 9/5 + 32)
-                                    
-                                    Text("\(Int(round(minDisplay)))°")
-                                        .foregroundColor(.gray)
-                                        .frame(width: 40)
-                                }
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .cornerRadius(12)
-                                .padding(.horizontal)
-                            }
-                        }
-                        .padding(.bottom)
-                    }
-                }
-                
-                Spacer()
+
+                Spacer(minLength: 0)
             }
-            .navigationTitle("Weather App")
+            .navigationTitle("Weather")
+            .task {
+                viewModel.restoreLastCachedIfAvailable()
+            }
         }
     }
-    
-    func getWeatherIcon(code: Int) -> String {
-        switch code {
-        case 0: return "sun.max.fill"
-        case 1...3: return "cloud.sun.fill"
-        case 45, 48: return "smoke.fill"
-        case 51...67: return "cloud.rain.fill"
-        case 71...77: return "snow"
-        case 95...99: return "cloud.bolt.rain.fill"
-        default: return "cloud.fill"
+
+    private var searchBar: some View {
+        HStack(spacing: 10) {
+            TextField("Search city (e.g. Almaty, Tokyo)", text: $viewModel.searchText)
+                .textFieldStyle(.roundedBorder)
+                .textInputAutocapitalization(.words)
+                .autocorrectionDisabled()
+                .submitLabel(.search)
+                .onSubmit {
+                    Task { await viewModel.search() }
+                }
+
+            Button {
+                Task { await viewModel.search() }
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .font(.headline)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Color.blue)
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .disabled(viewModel.isLoading)
+            .accessibilityLabel("Search city")
         }
+        .padding()
+    }
+
+    private var cityResultsList: some View {
+        List(viewModel.cities) { city in
+            Button {
+                Task { await viewModel.loadWeather(for: city) }
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(city.name)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Text(city.displaySubtitle)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .listStyle(.insetGrouped)
+    }
+
+    private var emptyStateView: some View {
+        VStack(spacing: 16) {
+            Spacer()
+            Image(systemName: "cloud.sun.fill")
+                .font(.system(size: 64))
+                .symbolRenderingMode(.multicolor)
+            Text("Check Live Weather")
+                .font(.title2.bold())
+            Text("Search any city worldwide for live conditions and a 7-day Open-Meteo forecast.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(quickCities, id: \.self) { city in
+                        Button(city) {
+                            viewModel.searchText = city
+                            Task { await viewModel.search() }
+                        }
+                        .buttonStyle(.bordered)
+                        .clipShape(Capsule())
+                    }
+                }
+                .padding(.horizontal)
+            }
+            Spacer()
+        }
+    }
+
+    private func weatherDetailScroll(weather: WeatherResponse, current: CurrentData) -> some View {
+        ScrollView {
+            VStack(spacing: 18) {
+                if viewModel.isOffline {
+                    Label("OFFLINE MODE — Showing cached forecast", systemImage: "wifi.slash")
+                        .font(.caption.bold())
+                        .foregroundStyle(.white)
+                        .padding(10)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.orange)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .padding(.horizontal)
+                }
+
+                if let city = viewModel.selectedCity {
+                    VStack(spacing: 4) {
+                        Text(city.name)
+                            .font(.largeTitle.bold())
+                        Text(city.displaySubtitle)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                if !viewModel.lastUpdateString.isEmpty {
+                    Text(viewModel.lastUpdateString)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Picker("Temperature Unit", selection: $unit) {
+                    ForEach(TemperatureUnit.allCases) { item in
+                        Text(item.rawValue).tag(item)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 180)
+
+                VStack(spacing: 10) {
+                    Image(systemName: WeatherCondition.symbol(for: current.weather_code))
+                        .resizable()
+                        .renderingMode(.original)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 108, height: 108)
+
+                    Text(unit.formattedTemperature(current.temperature_2m))
+                        .font(.system(size: 68, weight: .bold, design: .rounded))
+
+                    Text(WeatherCondition.description(for: current.weather_code))
+                        .font(.title3.weight(.medium))
+                        .foregroundStyle(.secondary)
+
+                    HStack(spacing: 28) {
+                        metricBadge(
+                            icon: "wind",
+                            label: "Wind",
+                            value: unit.formattedWind(kmh: current.wind_speed_10m)
+                        )
+                        metricBadge(
+                            icon: "humidity.fill",
+                            label: "Humidity",
+                            value: "\(current.relative_humidity_2m)%"
+                        )
+                    }
+                    .padding(.top, 6)
+                }
+                .padding()
+
+                Divider()
+                    .padding(.horizontal)
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("7-Day Forecast")
+                        .font(.headline)
+                        .padding(.horizontal)
+
+                    ForEach(weather.daily.forecastDays) { day in
+                        HStack {
+                            Text(day.formattedDate)
+                                .frame(width: 112, alignment: .leading)
+                                .font(.subheadline.weight(.medium))
+
+                            Spacer()
+
+                            Image(systemName: WeatherCondition.symbol(for: day.weatherCode))
+                                .renderingMode(.original)
+                                .font(.title3)
+
+                            Spacer()
+
+                            Text(unit.formattedTemperature(day.maxCelsius))
+                                .fontWeight(.bold)
+                                .frame(width: 48, alignment: .trailing)
+
+                            Text(unit.formattedTemperature(day.minCelsius))
+                                .foregroundStyle(.secondary)
+                                .frame(width: 48, alignment: .trailing)
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding(.horizontal)
+                    }
+                }
+            }
+            .padding(.bottom, 24)
+        }
+        .refreshable {
+            await viewModel.refresh()
+        }
+    }
+
+    private func metricBadge(icon: String, label: String, value: String) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .foregroundStyle(.blue)
+                .font(.title3)
+            Text(value)
+                .font(.headline)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(minWidth: 110)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 14)
+        .background(Color(.systemGray6))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
